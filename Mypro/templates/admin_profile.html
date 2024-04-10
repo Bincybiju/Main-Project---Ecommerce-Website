@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Profile</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Custom CSS -->
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            margin-top: 50px;
+        }
+        .btn-admin {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center mb-4">Welcome, Admin!</h1>
+
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <a href="/add_product" class="btn btn-primary btn-block btn-admin">Add Product</a>
+                        <a href="/edit_products" class="btn btn-primary btn-block btn-admin">Edit Products</a>
+                        <a href="/delete_products" class="btn btn-primary btn-block btn-admin">Delete Products</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row justify-content-center mt-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <a href="/view_orders_admin" class="btn btn-primary btn-block btn-admin">View Orders</a>
+                        <a href="/manage_orders" class="btn btn-primary btn-block btn-admin">Manage Orders</a>
+                        <a href="/view_reviews" class="btn btn-primary btn-block btn-admin">View Reviews</a> <!-- Add this line -->
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row justify-content-center mt-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                      
+                        <a href="/logout" class="btn btn-danger btn-block btn-admin">Logout</a>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+  
+</body>
+</html>

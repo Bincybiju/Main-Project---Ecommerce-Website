@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Reviews</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <a href="{% url 'admin_profile' %}" class="btn btn-secondary">Back</a>
+
+    <div class="container mt-4">
+        <h1 class="text-center mb-4">Products and Reviews</h1>
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>Image</th>
+                        <th>Product Name</th>
+                        <th>Description</th>
+                        <th>Price</th>
+                        <th>Reviews</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in products %}
+                        <tr>
+                            <td><img src="{{ product.image.url }}" class="img-thumbnail" alt="{{ product.product_name }}"></td>
+                            <td>{{ product.product_name }}</td>
+                            <td>{{ product.description }}</td>
+                            <td>${{ product.price }}</td>
+                            <td>
+                                <ul class="list-unstyled">
+                                    {% for review in product.reviews.all %}
+                                        <li>
+                                            <strong>User:</strong> {{ review.user.username }}<br>
+                                            <strong>Rating:</strong> {{ review.rating }}<br>
+                                            <strong>Review:</strong> {{ review.review }}
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

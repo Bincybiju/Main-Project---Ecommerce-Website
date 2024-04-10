@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirm Delete Product</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Custom CSS -->
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            margin-top: 50px;
+        }
+        .confirmation-box {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .confirmation-box h1 {
+            margin-bottom: 20px;
+        }
+        .confirmation-box p {
+            margin-bottom: 30px;
+        }
+        .btn-confirm {
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="confirmation-box">
+            <h1 class="text-center">Confirm Delete Product</h1>
+            <p class="lead">Are you sure you want to delete the product "{{ product.product_name }}"?</p>
+            <form method="post" >
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger btn-confirm">Delete</button>
+                <a href="{% url 'delete_products' %}" class="btn btn-secondary btn-confirm">Cancel</a>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

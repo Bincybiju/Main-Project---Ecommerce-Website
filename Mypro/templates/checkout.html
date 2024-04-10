@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            padding-top: 20px;
+            background-color: #e0ebf7; /* Light grayish blue background color */
+        }
+        .card-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        .card {
+            margin-bottom: 20px;
+            border: 1px solid #f6e4e9; /* Light gray border */
+            border-radius: 10px; /* Rounded corners for cards */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Box shadow for cards */
+        }
+        .total-price {
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-top: 20px;
+        }
+        /* Style for form fields */
+        .form-control {
+            border-color: #ced4da; /* Gray border color */
+        }
+        /* Style for primary button */
+        .btn-primary {
+            background-color: #007bff; /* Blue button color */
+            border-color: #007bff; /* Blue button border color */
+        }
+        .btn-primary:hover {
+            background-color: #0056b3; /* Darker blue button color on hover */
+            border-color: #0056b3; /* Darker blue button border color on hover */
+        }
+    </style>
+</head>
+<body>
+    <a href="{% url 'view_cart' %}" class="btn btn-primary mb-3">Back to Cart</a> 
+
+    <div class="container">
+        <h2 class="mb-4">Checkout</h2>
+        <div class="row">
+            {% for item in cart_items %}
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="row no-gutters">
+                        <div class="col-md-4">
+                            <img src="{{ item.product.image.url }}" class="card-img" alt="{{ item.product.product_name }}">
+                        </div>
+                        <div class="col-md-8">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ item.product.product_name }}</h5>
+                                <p class="card-text">{{ item.product.description }}</p>
+                                <p class="card-text">Price: ${{ item.product.price }}</p>
+                                <p class="card-text">Quantity: {{ item.quantity }}</p>
+                                <!-- <p class="card-text">Total price: {{ item.total_price }}</p> -->
+    
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="total-price">
+            Total Price: ${{ total_price }}
+        </div>
+        <!-- Checkout form -->
+        <form method="POST">
+            {% csrf_token %}
+            <!-- Shipping address field -->
+            <div class="form-group">
+                <label for="shipping_address">Shipping Address:</label>
+                <input type="text" class="form-control" id="shipping_address" name="shipping_address" required>
+            </div>
+            <!-- Payment method field -->
+            <div class="form-group">
+                <label for="payment_method">Payment Method:</label>
+                <select class="form-control" id="payment_method" name="payment_method">
+                    <option value="credit_card">Credit Card</option>
+                    <option value="paypal">PayPal</option>
+
+                    <option value="google_pay">Google Pay</option>
+                    <option value="cash_on_delivery">Cash on Delivery</option>
+                    <!-- Add more payment options as needed -->
+                </select>
+            </div>
+            <!-- Additional checkout form fields can be added here -->
+            <button type="submit" class="btn btn-primary">Place Order</button>
+        </form>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

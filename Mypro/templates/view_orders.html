@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Orders</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .order-card {
+            border: 1px solid #ebb59a;
+            border-radius: .25rem;
+            margin-bottom: 20px;
+        }
+        .order-card-header {
+            background-color: #b9dbfd;
+            padding: 10px;
+        }
+        .order-card-body {
+            padding: 20px;
+            background-color: #f5fad5;
+        }
+        .product-image {
+            max-width: 100px;
+            max-height: 100px;
+            object-fit: cover;
+            margin-right: 20px;
+        }
+    </style>
+</head>
+<body>
+    <a href="{% url 'customer_profile' %}" class="btn btn-primary">Back</a> 
+
+    <div class="container mt-5">
+        <h1 class="mb-4">Your Orders</h1>
+        {% for order in orders %}
+        <div class="card order-card">
+            <div class="card-header order-card-header">
+                <h4 class="mb-0">Order ID: {{ order.id }}</h4>
+            </div>
+            <div class="card-body order-card-body">
+                <p><strong>Shipping Address:</strong> {{ order.shipping_address }}</p>
+                <p><strong>Payment Method:</strong> {{ order.payment_method }}</p>
+                <p><strong>Status:</strong> 
+                    {% for status in orderstatus %}
+                        {% if status.order_id == order.id %}
+                            {{ status.status }}
+                        {% endif %}
+                    {% endfor %}
+                </p>
+                <h5 class="mt-3">Products:</h5>
+                <ul class="list-unstyled">
+                    {% for order_item in order.orderitem_set.all %}
+                    <li class="media mb-3">
+                        <img src="{{ order_item.product.image.url }}" class="mr-3 product-image" alt="{{ order_item.product.product_name }}">
+                        <div class="media-body">
+                            <h5 class="mt-0">{{ order_item.product.product_name }}</h5>
+                            <p><strong>Price:</strong> ${{ order_item.product.price }}</p>
+                            <p><strong>Quantity:</strong> {{ order_item.quantity }}</p>
+                            <!-- Add rate button -->
+                            <!-- Add rate button if the status is 'Delivered' -->
+                            {% for status in orderstatus %}
+                            {% if status.order_id == order.id and status.status == 'Delivered' %}
+                                <a href="{% url 'rate_product' order_item.product.id %}" class="btn btn-primary">Rate this product</a>
+                            {% endif %}
+                            {% endfor %}
+
+                            
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        {% empty %}
+        <p>No orders found.</p>
+        {% endfor %}
+    </div>
+    <!-- Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

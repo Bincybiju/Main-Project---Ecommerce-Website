@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Orders</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <a href="{% url 'admin_profile' %}" class="btn btn-secondary">Back</a>
+    <div class="container">
+        <h1 class="text-center mb-4">Manage Orders</h1>
+        <div class="card">
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>User</th>
+                            <th>Total Amount</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in orders %}
+                        <tr>
+                            <td>{{ order.id }}</td>
+                            <td>{{ order.user.username }}</td>
+                            <td>${{ order.total_price }}</td>
+                            <td>
+                                {% for status in order.orderstatus_set.all %}
+                                    {{ status.status }}
+                                {% endfor %}
+                            </td>
+                            <td>
+                                <a href="{% url 'update_order_status' order.id %}" class="btn btn-primary btn-sm">Update Status</a>
+                                <!-- Add more action buttons as needed -->
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="mt-4">
+        </div>
+    </div>
+</body>
+</html>

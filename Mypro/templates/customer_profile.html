@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Profile</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f7e6e6;
+            padding-top: 70px; /* Adjust padding to make space for navbar */
+        }
+        .star {
+            color: orange;
+        }
+        .card {
+            height: 100%;
+            background-color: rgb(241, 249, 214);
+        }
+        .card-img-top {
+            height: 400px; /* Adjust image height as needed */
+            object-fit: cover; /* Ensure images cover the entire space */
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">ShopMart</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item">
+                        <form class="form-inline" action="" method="GET">
+                            <div class="input-group">
+                                <input type="text" class="form-control" name="search" placeholder="Search by name">
+                                <div class="input-group-append">
+                                    <button class="btn btn-primary" type="submit">Search</button>
+                                </div>
+                            </div>
+                        </form>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="categoryDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Categories
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="categoryDropdown">
+                            <!-- Iterate over categories and display them -->
+                            {% for product in products %}
+                                <a class="dropdown-item" href="{% url 'filter_by_category' category_name=product.category %}">{{ product.category }}</a>
+                            {% endfor %}
+                        </div>
+                    </li>
+                </ul>
+                
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="filterDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Filter
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="filterDropdown">
+                            <form class="px-4 py-3" action="" method="GET">
+                                <div class="form-group">
+                                    <label for="minPrice">Min Price</label>
+                                    <input type="number" class="form-control" id="minPrice" name="min_price" placeholder="Min Price">
+                                </div>
+                                <div class="form-group">
+                                    <label for="maxPrice">Max Price</label>
+                                    <input type="number" class="form-control" id="maxPrice" name="max_price" placeholder="Max Price">
+                                </div>
+                                <button type="submit" class="btn btn-primary">Apply</button>
+                            </form>
+                        </div>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'view_cart' %}">View Cart</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'view_orders' %}">View Orders</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'change_password' %}">Change Password</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Content -->
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h2>Welcome, {{ user.username }}</h2>
+                <!-- Display all products -->
+                <h3>All Products</h3>
+                <div class="row">
+                    {% for product in products %}
+                        <div class="col-md-4">
+                            <div class="card mb-3" data-toggle="modal" data-target="#productModal{{ product.id }}">
+                                <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.product_name }}">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ product.product_name }}</h5>
+                                    <p class="card-text">{{ product.description }}</p>
+                                    <p class="card-text">Price: ${{ product.price }}</p>
+                                    {% if product.avg_rating %}
+                                        <p>Average Rating: {{ product.avg_rating|floatformat:1 }} ({{ product.reviews.count }} ratings)</p>
+                                    {% else %}
+                                        <p>No ratings yet</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Product Modal -->
+                        <div class="modal fade" id="productModal{{ product.id }}" tabindex="-1" role="dialog" aria-labelledby="productModalLabel{{ product.id }}" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="productModalLabel{{ product.id }}">{{ product.product_name }}</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <img src="{{ product.image.url }}" class="img-fluid mb-3" alt="{{ product.product_name }}">
+                                        <p>{{ product.description }}</p>
+                                        <p>Price: ${{ product.price }}</p>
+                                        {% if product.available_quantity == 0 %}
+                                            <p class="text-danger">Out of stock</p>
+                                        {% else %}
+                                            <form method="POST" action="{% url 'add_to_cart' product_id=product.id %}">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="product_id" value="{{ product.id }}">
+                                                <button type="submit" class="btn btn-primary">Add to Cart</button>
+                                            </form>
+                                        {% endif %}
+                                        <!-- Add review and ratings section -->
+                                        <!-- Inside the modal body -->
+                                        <h6>Reviews</h6>
+                                        {% if product.reviews.count > 0 %}
+                                            {% for review in product.reviews.all %}
+                                                <div class="review">
+                                                    <strong>{{ review.user.username }}</strong> 
+                                                    <span class="rating">
+                                                        {% for _ in product.rating_set.all %}
+                                                            {% if forloop.counter <= review.rating %}
+                                                                &#9733; 
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    </span>
+                                                    <br>
+                                                    <span>{{ review.review }}</span>
+                                                </div>
+                                            {% endfor %}
+                                        {% else %}
+                                            <p>No reviews yet</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    
+</body>
+</html>

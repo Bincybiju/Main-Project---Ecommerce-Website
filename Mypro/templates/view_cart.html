@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Shopping Cart</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            padding-top: 20px;
+            background-color: #f7e7f2; /* Wheat color */
+        }
+        .card-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        .card {
+            margin-bottom: 20px;
+            background-color: #f3f7e4; /* White background color for cards */
+            border-radius: 10px; /* Rounded corners for cards */
+            box-shadow: 0 0 10px rgba(214, 211, 211, 0.1); /* Box shadow for cards */
+        }
+        .btn-primary {
+            background-color: #4548df; /* Orange button color */
+            border-color: #2722ca; /* Orange button border color */
+        }
+        .btn-primary:hover {
+            background-color: #767fb4; /* Darker orange button color on hover */
+            border-color: #5e4cb5; /* Darker orange button border color on hover */
+        }
+        .btn-success {
+            background-color: #32cd32; /* Lime green button color */
+            border-color: #32cd32; /* Lime green button border color */
+        }
+        .btn-success:hover {
+            background-color: #228b22; /* Darker lime green button color on hover */
+            border-color: #228b22; /* Darker lime green button border color on hover */
+        }
+    </style>
+</head>
+<body>
+    <a href="{% url 'customer_profile' %}" class="btn btn-primary">Back</a> 
+    <div class="container">
+        <h2 class="mb-4">Shopping Cart</h2>
+        
+        {% if cart_items %}
+        <form id="cartForm" method="post">
+            {% csrf_token %}
+            <div class="row">
+                
+                {% for item in cart_items %}
+                <div class="col-md-4"> <!-- Adjusted to display 3 items per row -->
+                    <div class="card mb-3">
+                        <div class="row no-gutters">
+                            <div class="col-md-4">
+                                <img src="{{ item.product.image.url }}" class="card-img" alt="{{ item.product.product_name }}">
+                            </div>
+                            <div class="col-md-8">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ item.product.product_name }}</h5>
+                                    <p class="card-text">{{ item.product.description }}</p>
+                                    <p class="card-text">Price: ${{ item.product.price }}</p>
+                                    <div class="form-group">
+                                        <label for="quantity_{{ item.id }}">Quantity:</label>
+                                        {% if item.product.available_quantity > 0 %}
+                                            <input type="number" id="quantity_{{ item.id }}" name="quantity_{{ item.id }}" value="{{ item.quantity }}" min="1" max="{{ item.product.available_quantity }}">
+                                        {% else %}
+                                            <input type="number" id="quantity_{{ item.id }}" name="quantity_{{ item.id }}" value="0" min="0" max="0" disabled>
+                                            <small class="text-danger">Out of Stock</small>
+                                        {% endif %}
+                                    </div>
+                                    <p class="card-text">Total Price: ${{ item.total_price }}</p>
+                                    <a href="{% url 'remove_from_cart' item.id %}" class="btn btn-danger">Remove</a>
+
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <button type="submit" class="btn btn-primary">Update Cart</button>
+        </form>
+        <hr>
+        <div class="row">
+            <div class="col-md-6 offset-md-6">
+                <h5>Total Price: ${{ total_price }}</h5>
+                <a href="{% url 'checkout' %}" class="btn btn-success" id="checkoutBtn">Proceed to Checkout</a>
+            </div>
+        </div>
+        {% else %}
+        <p>Your shopping cart is empty.</p>
+        {% endif %}
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        document.getElementById("checkoutBtn").addEventListener("click", function(event) {
+            var outOfStock = document.querySelector('.text-danger');
+            if (outOfStock) {
+                event.preventDefault(); // Prevent the default action of clicking the link
+                alert('Some items are out of stock. Please remove them from your cart before proceeding.');
+                window.location.href = window.location.href; // Redirect to the same page
+            }
+        });
+    </script>
+    
+</body>
+</html>

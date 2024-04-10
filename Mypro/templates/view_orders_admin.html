@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View All Orders</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <a href="{% url 'admin_profile' %}" class="btn btn-primary">Back</a>
+
+    <div class="container">
+        <h1 class="text-center mb-4">All Orders</h1>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>User</th>
+                    <th>Shipping Address</th>
+                    <th>Total Price</th>
+                    <th>Products</th>
+                    <!-- Add more columns as needed -->
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                <tr>
+                    <td>{{ order.id }}</td>
+                    <td>{{ order.user.username }}</td>
+                    <td>{{ order.shipping_address }}</td>
+                    <td>${{ order.total_price }}</td>
+                    <td>
+                        <table class="table">
+                            {% for item in order.orderitem_set.all %}
+                            <tr>
+                                <td>
+                                    <strong>Product Name:</strong> {{ item.product.product_name }} <br>
+                                    <strong>Product ID:</strong> {{ item.product.id }} <br>
+                                    <strong>Quantity:</strong> {{ item.quantity }}
+                                </td>
+                                <td>
+                                    <img src="{{ item.product.image.url }}" alt="{{ item.product.product_name }}" style="max-width: 100px;">
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </table>
+                    </td>
+                    <!-- Display more order details as needed -->
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
