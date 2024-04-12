@@ -44,13 +44,11 @@ def delete_products(request):
 
 @login_required
 def delete_product(request, product_id):
-    # Get the product object to be deleted
     product = Product.objects.get(pk=product_id)
     
     if request.method == 'POST':
-        # Confirm deletion (optional) and handle the POST request to delete the product
         product.delete()
-        return redirect('admin_profile')  # Redirect to admin profile after deletion
+        return redirect('admin_profile') 
     
     return render(request, 'confirm_delete_product.html', {'product': product})
 
@@ -62,25 +60,37 @@ from django.db.models import Avg
 
 @login_required
 def customer_profile(request):
-    # Retrieve all products by default
     products = Product.objects.all()
     
-    # Calculate average rating for each product
     for product in products:
         avg_rating = Rating.objects.filter(product=product).aggregate(Avg('rating'))
         product.avg_rating = avg_rating['rating__avg'] if avg_rating['rating__avg'] else 0
 
-    # Handle search query
     search_query = request.GET.get('search')
     if search_query:
         products = products.filter(product_name__icontains=search_query)
-
-    # Handle filtering by minimum and maximum price
+        if not products.exists():
+            return render(request, 'customer_profile.html', {'error_message': 'No products available.', 'user': request.user})
+    
     min_price = request.GET.get('min_price')
     max_price = request.GET.get('max_price')
     if min_price and max_price:
         products = products.filter(price__gte=min_price, price__lte=max_price)
-
+        try:
+            min_price = float(min_price)
+            max_price = float(max_price)
+            if min_price < 0 or max_price < 0:
+                # Handle negative prices
+                return render(request, 'customer_profile.html', {'error_message': 'Prices cannot be negative.', 'user': request.user})
+            elif min_price > max_price:
+                # Handle invalid price range
+                return render(request, 'customer_profile.html', {'error_message': 'Minimum price cannot be greater than maximum price.', 'user': request.user})
+            else:
+                products = products.filter(price__gte=min_price, price__lte=max_price)
+                if not products.exists():
+                    return render(request, 'customer_profile.html', {'error_message': 'No products available.', 'user': request.user})
+        except ValueError:
+            return render(request, 'customer_profile.html', {'error_message': 'Invalid price format.', 'user': request.user})
     context = {
         'user': request.user,
         'products': products
@@ -93,7 +103,6 @@ def customer_profile(request):
 def add_to_cart(request, product_id):
     if request.method == 'POST':
         product = Product.objects.get(id=product_id)
-        # Create or update cart item
         cart_item, created = CartItem.objects.get_or_create(
             user=request.user,
             product=product
@@ -103,7 +112,6 @@ def add_to_cart(request, product_id):
         else:
             messages.info(request, f"{product.product_name} is already in your cart.")
 
-        # Redirect to cart page
         return redirect('view_cart')
     else:
         return HttpResponse(status=400)
@@ -125,7 +133,6 @@ def view_cart(request):
     for item in cart_items:
         item.total_price = item.product.price * item.quantity
     
-    # Calculate total price for all items in the cart
     total_price = sum(item.total_price for item in cart_items)
 
     context = {
@@ -156,17 +163,15 @@ def rate_product(request, product_id):
     if request.method == 'POST':
         form = RatingForm(request.POST)
         if form.is_valid():
-            # Process the form data and save the rating
             rating = form.save(commit=False)
-            rating.product_id = product.id  # Use product.id instead of product_id
-            rating.user = request.user  # Assuming you have user authentication
+            rating.product_id = product.id  
+            rating.user = request.user  
             rating.save()
             return HttpResponse('<script>alert("Product rated successfully!"); window.location.href = "/view_orders/";</script>')
 
     else:
         form = RatingForm()
     
-    # Merge context dictionaries
     context = {
         'form': form,
         'product': product
@@ -211,10 +216,9 @@ def checkout(request):
 
                 request.user.cartitem_set.all().delete()
 
-                # Send confirmation email to the customer
                 subject = 'Order Confirmation'
                 message = f"Dear {request.user.username},\n\nYour order has been successfully placed.\n\nThank you for shopping with us!\n\nBest regards,\nThe ShopMart Team"
-                from_email = 'your_email@example.com'  # Update with your email
+                from_email = 'tkmce.alumniportal@gmail.com' 
                 to_email = [request.user.email]
                 send_mail(subject, message, from_email, to_email)
 
@@ -268,10 +272,9 @@ def view_reviews(request):
     return render(request, 'view_reviews.html', {'reviews': reviews, 'products': products})
 
 def filter_by_category(request, category_name):
-    # Retrieve products filtered by category
     products = Product.objects.filter(category=category_name)
     context = {
         'products': products,
-        'user': request.user,  # Assuming the user is authenticated
+        'user': request.user, 
     }
     return render(request, 'customer_profile.html', context)
